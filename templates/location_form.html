@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-{{ 'pencil' if edit else 'plus-circle' }}"></i>
+                    {% if edit %}Edit{% else %}Add{% endif %} Location
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Location ID</label>
+                        <input type="text" name="location_id" class="form-control" 
+                               value="{{ location.location_id if edit else '' }}" 
+                               {% if edit %}readonly{% endif %} required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" 
+                               value="{{ location.name if edit else '' }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        {% if edit %}Update{% else %}Save{% endif %} Location
+                    </button>
+                    <a href="{{ url_for('locations') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

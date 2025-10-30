@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0 text-primary">
+                    <i class="bi bi-{{ 'pencil' if edit else 'plus-circle' }} me-2"></i>
+                    {% if edit %}Edit{% else %}Record{% endif %} Movement
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Tip:</strong> Leave "From" blank for receiving stock. Leave "To" blank for sales/dispatch.
+                    <br><small>Only locations with available stock are shown in the "From" dropdown.</small>
+                </div>
+                
+                <form method="POST" id="movementForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Movement ID</label>
+                        <input type="text" name="movement_id" class="form-control border-0 shadow-sm" 
+                               value="{{ movement.movement_id if edit else '' }}" 
+                               {% if edit %}readonly{% endif %} required
+                               placeholder="Enter movement ID">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Product</label>
+                        <select name="product_id" id="productSelect" class="form-select border-0 shadow-sm" required>
+                            <option value="">Select Product</option>
+                            {% for product in products %}
+                            <option value="{{ product.product_id }}" 
+                                    {% if edit and movement.product_id == product.product_id %}selected{% endif %}>
+                                {{ product.name }} ({{ product.product_id }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">From Location</label>
+                            <select name="from_location" id="fromLocation" class="form-select border-0 shadow-sm">
+                                <option value="">— None (Receiving) —</option>
+                                {% if edit %}
+                                    {% for location in locations %}
+                                    <option value="{{ location.location_id }}" 
+                                            {% if movement.from_location == location.location_id %}selected{% endif %}>
+                                        {{ location.name }}
+                                    </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="form-text" id="fromLocationHelp">
+                                {% if not edit %}Select a location to move stock from{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">To Location</label>
+                            <select name="to_location" class="form-select border-0 shadow-sm">
+                                <option value="">— None (Sales) —</option>
+                                {% for location in locations %}
+                                <option value="{{ location.location_id }}" 
+                                        {% if edit and movement.to_location == location.location_id %}selected{% endif %}>
+                                    {{ location.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Select a location to move stock to</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Quantity</label>
+                        <input type="number" name="qty" id="quantityInput" class="form-control border-0 shadow-sm" 
+                               value="{{ movement.qty if edit else '' }}" min="1" required
+                               placeholder="Enter quantity">
+                        <div class="form-text" id="quantityHelp">
+                            Enter the quantity to move
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('movements') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-{{ 'check' if edit else 'plus' }}-circle me-1"></i>
+                            {% if edit %}Update{% else %}Record{% endif %} Movement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not edit %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productSelect = document.getElementById('productSelect');
+    const fromLocation = document.getElementById('fromLocation');
+    const fromLocationHelp = document.getElementById('fromLocationHelp');
+    const quantityHelp = document.getElementById('quantityHelp');
+    
+    productSelect.addEventListener('change', function() {
+        const productId = this.value;
+        
+        // Clear from location dropdown
+        fromLocation.innerHTML = '<option value="">— None (Receiving) —</option>';
+        fromLocationHelp.textContent = 'Select a location to move stock from';
+        quantityHelp.textContent = 'Enter the quantity to move';
+        
+        if (productId) {
+            // Show loading state
+            fromLocationHelp.textContent = 'Loading available locations...';
+            
+            // Fetch locations with stock for this product
+            fetch(`/api/locations_with_stock/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    fromLocationHelp.textContent = 'Select a location to move stock from';
+                    
+                    if (data.locations && data.locations.length > 0) {
+                        data.locations.forEach(location => {
+                            const option = document.createElement('option');
+                            option.value = location.location_id;
+                            option.textContent = `${location.location_name} (${location.balance} available)`;
+                            option.setAttribute('data-balance', location.balance);
+                            fromLocation.appendChild(option);
+                        });
+                        fromLocationHelp.textContent = `Found ${data.locations.length} location(s) with available stock`;
+                    } else {
+                        fromLocationHelp.textContent = 'No locations have this product in stock. You can only receive new stock.';
+                        fromLocationHelp.className = 'form-text text-warning';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching locations:', error);
+                    fromLocationHelp.textContent = 'Error loading locations. Please try again.';
+                    fromLocationHelp.className = 'form-text text-danger';
+                });
+        }
+    });
+    
+    // Add validation for quantity based on selected from location
+    fromLocation.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const maxQuantity = selectedOption.getAttribute('data-balance');
+        
+        if (maxQuantity) {
+            quantityHelp.textContent = `Maximum available quantity: ${maxQuantity}`;
+            document.getElementById('quantityInput').max = maxQuantity;
+        } else {
+            quantityHelp.textContent = 'Enter the quantity to move';
+            document.getElementById('quantityInput').removeAttribute('max');
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

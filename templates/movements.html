@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Product Movements</h2>
+    <a href="{{ url_for('add_movement') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Record Movement
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if movements %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Movement ID</th>
+                        <th>Product</th>
+                        <th>From Location</th>
+                        <th>To Location</th>
+                        <th>Quantity</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in movements %}
+                    <tr>
+                        <td><code>{{ movement.movement_id }}</code></td>
+                        <td>
+                            <strong>{{ movement.product_name }}</strong>
+                            <br><small class="text-muted">{{ movement.product_id }}</small>
+                        </td>
+                        <td>
+                            {% if movement.from_location_name %}
+                                <strong>{{ movement.from_location_name }}</strong>
+                                <br><small class="text-muted">{{ movement.from_location }}</small>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if movement.to_location_name %}
+                                <strong>{{ movement.to_location_name }}</strong>
+                                <br><small class="text-muted">{{ movement.to_location }}</small>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ movement.qty }}</span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ movement.timestamp.strftime('%Y-%m-%d %H:%M') if movement.timestamp else 'N/A' }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('edit_movement', movement_id=movement.movement_id) }}" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_movement', movement_id=movement.movement_id) }}" 
+                                      style="display: inline;" onsubmit="return confirm('Delete this movement?')">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-arrow-left-right display-1 text-muted"></i>
+            <p class="text-muted mt-3">No movements recorded yet. <a href="{{ url_for('add_movement') }}">Record the first one!</a></p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

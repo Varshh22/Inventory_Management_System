@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0 text-primary">
+                    <i class="bi bi-{{ 'pencil' if edit else 'plus-circle' }} me-2"></i>
+                    {% if edit %}Edit{% else %}Add{% endif %} Product
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Product ID</label>
+                        <input type="text" name="product_id" class="form-control border-0 shadow-sm" 
+                               value="{{ product.product_id if edit else '' }}" 
+                               {% if edit %}readonly{% endif %} required
+                               placeholder="Enter product ID">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Name</label>
+                        <input type="text" name="name" class="form-control border-0 shadow-sm" 
+                               value="{{ product.name if edit else '' }}" required
+                               placeholder="Enter product name">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category</label>
+                        <input type="text" name="category" class="form-control border-0 shadow-sm" 
+                               value="{{ product.category if edit else '' }}"
+                               placeholder="Enter product category">
+                    </div>
+
+                    {% if not edit %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Initial Location (Optional)</label>
+                        <select name="initial_location" class="form-select border-0 shadow-sm">
+                            <option value="">— Select Location —</option>
+                            {% for location in locations %}
+                            <option value="{{ location.location_id }}">{{ location.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Select where to initially stock this product</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Initial Quantity</label>
+                        <input type="number" name="initial_qty" class="form-control border-0 shadow-sm" value="0" min="0">
+                        <div class="form-text">Set initial stock quantity (0 if not adding to location)</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-{{ 'check' if edit else 'plus' }}-circle me-1"></i>
+                            {% if edit %}Update{% else %}Save{% endif %} Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

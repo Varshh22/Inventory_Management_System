@@ -3,43 +3,400 @@
 {% block title %}Register - Inventory System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Register</h4>
+<style>
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .register-card {
+        max-width: 900px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(155, 135, 245, 0.3);
+        animation: slideUp 0.6s ease;
+        display: grid;
+        grid-template-columns: 45% 55%;
+    }
+    
+    @media (max-width: 768px) {
+        .register-card {
+            max-width: 450px;
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, #9b87f5 0%, #7e69c1 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100%;
+    }
+    
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .register-icon {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 1;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .register-icon i {
+        font-size: 3.5rem;
+        color: white;
+    }
+    
+    .register-header h4 {
+        color: white;
+        margin: 0;
+        font-weight: 700;
+        font-size: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .register-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 1rem 0 0;
+        position: relative;
+        z-index: 1;
+        font-size: 1.1rem;
+    }
+    
+    .register-body {
+        padding: 3rem 3.5rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating .form-control {
+        border: 2px solid rgba(155, 135, 245, 0.2);
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        height: calc(3.5rem + 2px);
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating .form-control:focus {
+        border-color: #9b87f5;
+        box-shadow: 0 0 0 0.25rem rgba(155, 135, 245, 0.15);
+    }
+    
+    .form-floating label {
+        padding: 1rem 0.75rem;
+        color: #6c757d;
+    }
+    
+    .input-group-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9b87f5;
+        z-index: 10;
+        font-size: 1.2rem;
+    }
+    
+    .password-toggle {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #7e69c1;
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #9b87f5 0%, #7e69c1 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(155, 135, 245, 0.4);
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(155, 135, 245, 0.5);
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    }
+    
+    .btn-register:active {
+        transform: translateY(0);
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        color: #6c757d;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(155, 135, 245, 0.3), transparent);
+    }
+    
+    .divider span {
+        padding: 0 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .login-link {
+        text-align: center;
+        padding: 1.5rem 0 0;
+    }
+    
+    .login-link a {
+        color: #9b87f5;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .login-link a:hover {
+        color: #7e69c1;
+        text-decoration: underline;
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        border-radius: 2px;
+        background: #e9ecef;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        width: 0%;
+    }
+    
+    .strength-weak { 
+        width: 33%; 
+        background: #dc3545; 
+    }
+    
+    .strength-medium { 
+        width: 66%; 
+        background: #ffc107; 
+    }
+    
+    .strength-strong { 
+        width: 100%; 
+        background: #28a745; 
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="bi bi-person-plus-fill"></i>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required>
-                        <div class="form-text">Choose a unique username</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success w-100">Register</button>
-                </form>
-                
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+            <h4>Create Account</h4>
+            <p>Join our inventory management system</p>
+        </div>
+        
+        <div class="register-body">
+            <form method="POST" id="registerForm">
+                <div class="form-floating position-relative">
+                    <input type="text" 
+                           name="username" 
+                           class="form-control" 
+                           id="username" 
+                           placeholder="Username" 
+                           required
+                           autocomplete="username">
+                    <label for="username">Username</label>
+                    <i class="bi bi-person-fill input-group-icon"></i>
                 </div>
+                
+                <div class="form-floating position-relative">
+                    <input type="email" 
+                           name="email" 
+                           class="form-control" 
+                           id="email" 
+                           placeholder="Email" 
+                           required
+                           autocomplete="email">
+                    <label for="email">Email Address</label>
+                    <i class="bi bi-envelope-fill input-group-icon"></i>
+                </div>
+                
+                <div class="form-floating position-relative">
+                    <input type="password" 
+                           name="password" 
+                           class="form-control" 
+                           id="password" 
+                           placeholder="Password" 
+                           required
+                           autocomplete="new-password"
+                           oninput="checkPasswordStrength()">
+                    <label for="password">Password</label>
+                    <i class="bi bi-eye-fill input-group-icon password-toggle" 
+                       onclick="togglePassword('password', 'toggleIcon1')"
+                       id="toggleIcon1"></i>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthBar"></div>
+                    </div>
+                    <small id="strengthText" class="text-muted"></small>
+                </div>
+                
+                <div class="form-floating position-relative">
+                    <input type="password" 
+                           name="confirm_password" 
+                           class="form-control" 
+                           id="confirm_password" 
+                           placeholder="Confirm Password" 
+                           required
+                           autocomplete="new-password">
+                    <label for="confirm_password">Confirm Password</label>
+                    <i class="bi bi-eye-fill input-group-icon password-toggle" 
+                       onclick="togglePassword('confirm_password', 'toggleIcon2')"
+                       id="toggleIcon2"></i>
+                </div>
+                
+                <button type="submit" class="btn btn-register">
+                    <i class="bi bi-person-check-fill me-2"></i>Create Account
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>Already have an account?</span>
+            </div>
+            
+            <div class="login-link">
+                <p class="mb-0">Sign in to your account <a href="{{ url_for('login') }}">Login here</a></p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword(fieldId, iconId) {
+    const passwordInput = document.getElementById(fieldId);
+    const toggleIcon = document.getElementById(iconId);
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye-fill');
+        toggleIcon.classList.add('bi-eye-slash-fill');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash-fill');
+        toggleIcon.classList.add('bi-eye-fill');
+    }
+}
+
+function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    let strength = 0;
+    
+    if (password.length >= 8) strength++;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+    if (password.match(/[0-9]/)) strength++;
+    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+    
+    strengthBar.className = 'strength-fill';
+    
+    if (strength === 0) {
+        strengthBar.style.width = '0%';
+        strengthText.textContent = '';
+    } else if (strength <= 2) {
+        strengthBar.classList.add('strength-weak');
+        strengthText.textContent = 'Weak password';
+        strengthText.style.color = '#dc3545';
+    } else if (strength === 3) {
+        strengthBar.classList.add('strength-medium');
+        strengthText.textContent = 'Medium password';
+        strengthText.style.color = '#ffc107';
+    } else {
+        strengthBar.classList.add('strength-strong');
+        strengthText.textContent = 'Strong password';
+        strengthText.style.color = '#28a745';
+    }
+}
+
+// Form validation
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+    }
+});
+</script>
 {% endblock %}

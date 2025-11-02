@@ -3,32 +3,325 @@
 {% block title %}Login - Inventory System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Login</h4>
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .login-card {
+        max-width: 900px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(155, 135, 245, 0.3);
+        animation: slideUp 0.6s ease;
+        display: grid;
+        grid-template-columns: 45% 55%;
+    }
+    
+    @media (max-width: 768px) {
+        .login-card {
+            max-width: 450px;
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #9b87f5 0%, #7e69c1 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100%;
+    }
+    
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .login-icon {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 1;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .login-icon i {
+        font-size: 3.5rem;
+        color: white;
+    }
+    
+    .login-header h4 {
+        color: white;
+        margin: 0;
+        font-weight: 700;
+        font-size: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .login-header p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 1rem 0 0;
+        position: relative;
+        z-index: 1;
+        font-size: 1.1rem;
+    }
+    
+    .login-body {
+        padding: 3rem 3.5rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating .form-control {
+        border: 2px solid rgba(155, 135, 245, 0.2);
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        height: calc(3.5rem + 2px);
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating .form-control:focus {
+        border-color: #9b87f5;
+        box-shadow: 0 0 0 0.25rem rgba(155, 135, 245, 0.15);
+    }
+    
+    .form-floating label {
+        padding: 1rem 0.75rem;
+        color: #6c757d;
+    }
+    
+    .input-group-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9b87f5;
+        z-index: 10;
+        font-size: 1.2rem;
+    }
+    
+    .password-toggle {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #7e69c1;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #9b87f5 0%, #7e69c1 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(155, 135, 245, 0.4);
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(155, 135, 245, 0.5);
+        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    }
+    
+    .btn-login:active {
+        transform: translateY(0);
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        color: #6c757d;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(155, 135, 245, 0.3), transparent);
+    }
+    
+    .divider span {
+        padding: 0 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .register-link {
+        text-align: center;
+        padding: 1.5rem 0 0;
+    }
+    
+    .register-link a {
+        color: #9b87f5;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .register-link a:hover {
+        color: #7e69c1;
+        text-decoration: underline;
+    }
+    
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: #9b87f5;
+        border-color: #9b87f5;
+    }
+    
+    .forgot-link {
+        color: #9b87f5;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .forgot-link:hover {
+        color: #7e69c1;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="bi bi-box-seam"></i>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
-                </form>
-                
-                <div class="text-center mt-3">
-                    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            <h4>Welcome Back!</h4>
+            <p>Login to manage your inventory</p>
+        </div>
+        
+        <div class="login-body">
+            <form method="POST">
+                <div class="form-floating position-relative">
+                    <input type="text" 
+                           name="username" 
+                           class="form-control" 
+                           id="username" 
+                           placeholder="Username" 
+                           required
+                           autocomplete="username">
+                    <label for="username">Username</label>
+                    <i class="bi bi-person-fill input-group-icon"></i>
                 </div>
+                
+                <div class="form-floating position-relative">
+                    <input type="password" 
+                           name="password" 
+                           class="form-control" 
+                           id="password" 
+                           placeholder="Password" 
+                           required
+                           autocomplete="current-password">
+                    <label for="password">Password</label>
+                    <i class="bi bi-eye-fill input-group-icon password-toggle" 
+                       onclick="togglePassword()"
+                       id="toggleIcon"></i>
+                </div>
+                
+                <div class="remember-forgot">
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               value="" 
+                               id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>New to Inventory System?</span>
+            </div>
+            
+            <div class="register-link">
+                <p class="mb-0">Don't have an account? <a href="{{ url_for('register') }}">Create one now</a></p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye-fill');
+        toggleIcon.classList.add('bi-eye-slash-fill');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash-fill');
+        toggleIcon.classList.add('bi-eye-fill');
+    }
+}
+</script>
 {% endblock %}

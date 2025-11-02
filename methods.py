@@ -255,7 +255,7 @@ def initialize_sample_data():
         db.session.add(admin_user)
     
     if not Product.query.first():
-        # Sample data
+        
         products = [
             Product(product_id='P001', name='Laptop', category='Electronics'),
             Product(product_id='P002', name='Chair', category='Furniture'),

@@ -10,16 +10,7 @@ It provides an intuitive web interface to handle **product stock**, **warehouse 
 - [Tech Stack](#-tech-stack)
 - [System Requirements](#-system-requirements)
 - [Installation Guide](#-installation-guide)
-- [Database Setup](#-database-setup)
-- [How to Run the Project](#-how-to-run-the-project)
-- [Folder Structure](#-folder-structure)
-- [Usage Instructions](#-usage-instructions)
-- [Application Flow](#-application-flow)
-- [Sample Credentials](#-sample-credentials)
 - [Screenshots / Output](#-screenshots--output)
-- [Future Enhancements](#-future-enhancements)
-- [Author](#-author)
-- [License](#-license)
 
 ---
 

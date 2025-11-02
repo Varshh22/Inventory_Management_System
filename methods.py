@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 from datetime import datetime
 from models import db, User, Product, Location, ProductMovement
 
-# Authentication Methods
+
 def handle_register(request):
     username = request.form['username']
     email = request.form['email']
@@ -48,7 +48,7 @@ def handle_login(request, session):
         flash('Invalid username or password!', 'danger')
         return redirect(url_for('login'))
 
-# Product Methods
+
 def handle_add_product(request):
     product_id = request.form['product_id']
     if Product.query.get(product_id):
@@ -99,7 +99,7 @@ def handle_delete_product(product_id):
     flash('Product deleted successfully!', 'success')
     return redirect(url_for('products'))
 
-# Location Methods
+
 def handle_add_location(request):
     location_id = request.form['location_id']
     if Location.query.get(location_id):
@@ -128,7 +128,7 @@ def handle_delete_location(location_id):
     flash('Location deleted successfully!', 'success')
     return redirect(url_for('locations'))
 
-# Movement Methods
+
 def get_locations_with_product(product_id):
     """Get all locations that have the specified product in stock"""
     balance_data = generate_balance_report()
@@ -155,7 +155,7 @@ def handle_add_movement(request):
     to_location = request.form['to_location'] or None
     quantity = int(request.form['qty'])
     
-    # Validate stock availability if moving from a location
+    # Validate stock availability while making movements
     if from_location:
         locations_with_stock = get_locations_with_product(product_id)
         source_location = next((loc for loc in locations_with_stock if loc['location_id'] == from_location), None)
@@ -196,20 +196,20 @@ def handle_delete_movement(movement_id):
     flash('Movement deleted successfully!', 'success')
     return redirect(url_for('movements'))
 
-# Report Methods
+
 def generate_balance_report():
     movements = ProductMovement.query.all()
     balance = {}
     
     for move in movements:
-        # Add to destination location
+        
         if move.to_location:
             key = (move.product_id, move.to_location)
             if key not in balance:
                 balance[key] = 0
             balance[key] += move.qty
         
-        # Subtract from source location
+       
         if move.from_location:
             key = (move.product_id, move.from_location)
             if key not in balance:
@@ -218,7 +218,7 @@ def generate_balance_report():
     
     balance_data = []
     for (product_id, location_id), qty in balance.items():
-        # Ensure balance doesn't go below 0
+        # Ensure stock doesn't go below 0
         if qty < 0:
             qty = 0
             
@@ -236,7 +236,7 @@ def generate_balance_report():
     
     return balance_data
 
-# Utility Methods
+
 def get_dashboard_stats():
     return {
         'products': Product.query.count(),
@@ -245,7 +245,7 @@ def get_dashboard_stats():
     }
 
 def initialize_sample_data():
-    """Initialize database with sample data if empty"""
+    
     if not User.query.first():
         admin_user = User(
             username='admin',

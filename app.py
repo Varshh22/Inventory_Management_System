@@ -3,16 +3,16 @@ from functools import wraps
 from models import db, User, Product, Location, ProductMovement
 from methods import *
 
-# Create Flask app
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'inventory-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize app with extensions
+
 db.init_app(app)
 
-# Authentication required decorator
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -29,20 +29,20 @@ def index():
     stats = get_dashboard_stats()
     recent_movements = ProductMovement.query.order_by(ProductMovement.timestamp.desc()).limit(5).all()
     
-    # Enhance recent movements with names for display
+    
     for movement in recent_movements:
-        # Get product name
+        
         product = Product.query.get(movement.product_id)
         movement.product_name = product.name if product else movement.product_id
         
-        # Get from location name
+        
         if movement.from_location:
             from_loc = Location.query.get(movement.from_location)
             movement.from_location_name = from_loc.name if from_loc else movement.from_location
         else:
             movement.from_location_name = None
             
-        # Get to location name
+       
         if movement.to_location:
             to_loc = Location.query.get(movement.to_location)
             movement.to_location_name = to_loc.name if to_loc else movement.to_location
@@ -51,7 +51,7 @@ def index():
     
     return render_template('index.html', stats=stats, recent_movements=recent_movements)
 
-# Authentication Routes
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -70,7 +70,7 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-# Product Routes
+
 @app.route('/products')
 @login_required
 def products():
@@ -100,7 +100,7 @@ def edit_product(product_id):
 def delete_product(product_id):
     return handle_delete_product(product_id)
 
-# Location Routes
+
 @app.route('/locations')
 @login_required
 def locations():
@@ -134,20 +134,20 @@ def delete_location(location_id):
 def movements():
     movements = ProductMovement.query.order_by(ProductMovement.timestamp.desc()).all()
     
-    # Enhance movements with product and location names
+    
     for movement in movements:
-        # Get product name
+        
         product = Product.query.get(movement.product_id)
         movement.product_name = product.name if product else movement.product_id
         
-        # Get from location name
+        
         if movement.from_location:
             from_loc = Location.query.get(movement.from_location)
             movement.from_location_name = from_loc.name if from_loc else movement.from_location
         else:
             movement.from_location_name = None
             
-        # Get to location name
+        
         if movement.to_location:
             to_loc = Location.query.get(movement.to_location)
             movement.to_location_name = to_loc.name if to_loc else movement.to_location
@@ -162,7 +162,7 @@ def add_movement():
     if request.method == 'POST':
         return handle_add_movement(request)
     
-    # Get all products and locations for the form
+    
     products = Product.query.all()
     all_locations = Location.query.all()
     
@@ -189,21 +189,21 @@ def edit_movement(movement_id):
 def delete_movement(movement_id):
     return handle_delete_movement(movement_id)
 
-# API Routes
+
 @app.route('/api/locations_with_stock/<product_id>')
 @login_required
 def get_locations_with_stock(product_id):
     locations = get_locations_with_product(product_id)
     return jsonify({'locations': locations})
 
-# Report Route
+
 @app.route('/reports/balance')
 @login_required
 def balance_report():
     balance_data = generate_balance_report()
     return render_template('balance_report.html', balance_data=balance_data)
 
-# Initialize database
+
 def init_db():
     with app.app_context():
         db.create_all()

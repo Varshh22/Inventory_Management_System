@@ -68,6 +68,37 @@ It’s lightweight, database-driven, and can easily scale from a local setup to 
 
 ---
 
+## 📸 Screenshots / Output
+
+### 🔑 Login Page
+![Login Page](screenshots/login.png)
+
+### 🔑 Register Page
+![Register Page](screenshots/register.png)
+
+### 🏠 Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+![Dashboard](screenshots/dashboard1.png)
+
+### 📦 Products
+![Products](screenshots/products.png)
+
+### 📦 Add Products
+![Add Products](screenshots/addproducts.png)
+
+### 📍 Locations
+![Locations](screenshots/locations.png)
+
+### 🔁 Movements
+![Movements](screenshots/movements.png)
+
+### 📈 Balance Report
+![Balance Report](screenshots/report.png)
+
+
+---
+
 ## 🧰 Tech Stack
 
 | Layer | Technology Used |

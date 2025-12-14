@@ -8,11 +8,33 @@
     </a>
 </div>
 
+<!-- Search Bar -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" 
+                   id="searchInput" 
+                   class="form-control border-start-0" 
+                   placeholder="Search by Product ID or Name..."
+                   onkeyup="searchTable()">
+            <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                <i class="bi bi-x-circle"></i> Clear
+            </button>
+        </div>
+        <small class="text-muted mt-2 d-block">
+            <span id="resultCount"></span>
+        </small>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         {% if products %}
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped" id="productsTable">
                 <thead>
                     <tr>
                         <th>Product ID</th>
@@ -46,9 +68,65 @@
                 </tbody>
             </table>
         </div>
+        <div id="noResults" style="display: none;" class="text-center py-4">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <p class="text-muted mt-3">No products found matching your search.</p>
+        </div>
         {% else %}
         <p class="text-center text-muted">No products found. <a href="{{ url_for('add_product') }}">Add the first one!</a></p>
         {% endif %}
     </div>
 </div>
+
+<script>
+function searchTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById('productsTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = tbody.getElementsByTagName('tr');
+    const noResults = document.getElementById('noResults');
+    const resultCount = document.getElementById('resultCount');
+    
+    let visibleCount = 0;
+    
+    for (let i = 0; i < rows.length; i++) {
+        const productId = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+        const productName = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+        const category = rows[i].getElementsByTagName('td')[2].textContent.toLowerCase();
+        
+        if (productId.includes(filter) || productName.includes(filter) || category.includes(filter)) {
+            rows[i].style.display = '';
+            visibleCount++;
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+    
+    // Show/hide no results message
+    if (visibleCount === 0 && filter !== '') {
+        table.style.display = 'none';
+        noResults.style.display = 'block';
+        resultCount.textContent = 'No results found';
+    } else {
+        table.style.display = 'table';
+        noResults.style.display = 'none';
+        if (filter !== '') {
+            resultCount.textContent = `Showing ${visibleCount} of ${rows.length} products`;
+        } else {
+            resultCount.textContent = `Total: ${rows.length} products`;
+        }
+    }
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    searchTable();
+}
+
+// Initialize result count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    searchTable();
+});
+</script>
 {% endblock %}

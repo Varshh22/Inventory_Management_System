@@ -8,11 +8,33 @@
     </a>
 </div>
 
+<!-- Search Bar -->
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" 
+                   id="searchInput" 
+                   class="form-control border-start-0" 
+                   placeholder="Search by Movement ID, Product ID, Product Name, or Location..."
+                   onkeyup="searchTable()">
+            <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                <i class="bi bi-x-circle"></i> Clear
+            </button>
+        </div>
+        <small class="text-muted mt-2 d-block">
+            <span id="resultCount"></span>
+        </small>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         {% if movements %}
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped" id="movementsTable">
                 <thead>
                     <tr>
                         <th>Movement ID</th>
@@ -73,6 +95,10 @@
                 </tbody>
             </table>
         </div>
+        <div id="noResults" style="display: none;" class="text-center py-4">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <p class="text-muted mt-3">No movements found matching your search.</p>
+        </div>
         {% else %}
         <div class="text-center py-4">
             <i class="bi bi-arrow-left-right display-1 text-muted"></i>
@@ -81,4 +107,60 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+function searchTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById('movementsTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = tbody.getElementsByTagName('tr');
+    const noResults = document.getElementById('noResults');
+    const resultCount = document.getElementById('resultCount');
+    
+    let visibleCount = 0;
+    
+    for (let i = 0; i < rows.length; i++) {
+        const movementId = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+        const productInfo = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+        const fromLocation = rows[i].getElementsByTagName('td')[2].textContent.toLowerCase();
+        const toLocation = rows[i].getElementsByTagName('td')[3].textContent.toLowerCase();
+        
+        if (movementId.includes(filter) || 
+            productInfo.includes(filter) || 
+            fromLocation.includes(filter) || 
+            toLocation.includes(filter)) {
+            rows[i].style.display = '';
+            visibleCount++;
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+    
+    // Show/hide no results message
+    if (visibleCount === 0 && filter !== '') {
+        table.style.display = 'none';
+        noResults.style.display = 'block';
+        resultCount.textContent = 'No results found';
+    } else {
+        table.style.display = 'table';
+        noResults.style.display = 'none';
+        if (filter !== '') {
+            resultCount.textContent = `Showing ${visibleCount} of ${rows.length} movements`;
+        } else {
+            resultCount.textContent = `Total: ${rows.length} movements`;
+        }
+    }
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    searchTable();
+}
+
+// Initialize result count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    searchTable();
+});
+</script>
 {% endblock %}

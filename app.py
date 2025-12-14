@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from functools import wraps
 from models import db, User, Product, Location, ProductMovement
 from methods import *
+import os
 
 
 app = Flask(__name__)
@@ -205,10 +206,21 @@ def balance_report():
 
 
 def init_db():
+    """Initialize database - only creates tables and sample data if database doesn't exist"""
     with app.app_context():
+        # Check if database file exists
+        db_path = 'instance/inventory.db'
+        db_exists = os.path.exists(db_path)
+        
+        # Create all tables
         db.create_all()
-        initialize_sample_data()
-        print("Database initialized!")
+        
+        # Only initialize sample data if this is a fresh database
+        if not db_exists or User.query.count() == 0:
+            initialize_sample_data()
+            print("Database initialized with sample data!")
+        else:
+            print("Database already exists, skipping initialization.")
 
 if __name__ == '__main__':
     init_db()

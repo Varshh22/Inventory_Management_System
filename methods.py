@@ -1,7 +1,7 @@
 from flask import redirect, url_for, flash
 from werkzeug.security import check_password_hash
 from datetime import datetime
-from models import db, User, Product, Location, ProductMovement
+from models import db, User, Product, Location, ProductMovement, get_ist_now
 
 
 def handle_register(request):
@@ -73,7 +73,7 @@ def handle_add_product(request):
             product_id=product_id,
             to_location=initial_location,
             qty=int(initial_qty),
-            timestamp=datetime.utcnow()
+            timestamp=get_ist_now()
         )
         db.session.add(movement)
         location_name = Location.query.get(initial_location).name
@@ -173,7 +173,8 @@ def handle_add_movement(request):
         product_id=product_id,
         from_location=from_location,
         to_location=to_location,
-        qty=quantity
+        qty=quantity,
+        timestamp=get_ist_now()
     ))
     db.session.commit()
     flash('Movement recorded successfully!', 'success')
@@ -269,9 +270,9 @@ def initialize_sample_data():
         ]
         
         movements = [
-            ProductMovement(movement_id='M001', product_id='P001', to_location='L001', qty=50),
-            ProductMovement(movement_id='M002', product_id='P002', to_location='L001', qty=30),
-            ProductMovement(movement_id='M003', product_id='P001', from_location='L001', to_location='L003', qty=10),
+            ProductMovement(movement_id='M001', product_id='P001', to_location='L001', qty=50, timestamp=get_ist_now()),
+            ProductMovement(movement_id='M002', product_id='P002', to_location='L001', qty=30, timestamp=get_ist_now()),
+            ProductMovement(movement_id='M003', product_id='P001', from_location='L001', to_location='L003', qty=10, timestamp=get_ist_now()),
         ]
         
         db.session.add_all(products + locations + movements)
